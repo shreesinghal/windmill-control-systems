@@ -7,6 +7,7 @@ class StepperMotor {
     const int stepPin = 3;
     const int stepsPerRevolution = 200;
     const double anglePerStep = 1.8;
+    bool run;
 
   public: 
   StepperMotor() {
@@ -35,9 +36,11 @@ class StepperMotor {
     // Sets to the best approximation for angle
     // Divides the angle by 1.8
     void setAngle(double newAngle) {
-      if (newAngle >= 90) {
+      //Serial.println("hi");
+      if (newAngle >= 90 || newAngle < 0) {
         Serial.println("Degree value out of bounds");
       }
+
       else if (this->angle != newAngle) {
 
         // sets it counter 
@@ -56,7 +59,6 @@ class StepperMotor {
           delayMicroseconds(3000);
         }
         this->angle = newAngle;
-
       }
     }
 
@@ -87,6 +89,7 @@ void loop() {
   Serial.println("Enter in a degree: ");
   if (Serial.available() > 0) {
     degree = Serial.parseFloat();
+    Serial.println("calling");
     s->setAngle(degree);
   }
 
