@@ -62,6 +62,11 @@ class StepperMotor {
       }
     }
 
+    // changes the angle by the amount given
+    void changeAngle(double inc) {
+      this->setAngle(this->angle + inc);
+    }
+
   private:
     int angleToSteps(double angle) {
       return angle / anglePerStep;
