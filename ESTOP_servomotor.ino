@@ -1,9 +1,8 @@
 /*
-ReNU 6/13/24 - Clara
+ReNU 6/17/24 - Clara
 First draft of code for E-stop using sparkfun redboard, servo motor, button, and switch
 Will either use button or switch (idea is to use a pushbutton switch to keep the state)
 We will change the servo motor out for the E-stop motor, and the redboard for the STM board
-Will update to use millis timer to constantly check state of button
 Will update to use OOP
 */
 
@@ -11,13 +10,12 @@ Will update to use OOP
 
 int switchPin = 11;
 int estopButton = 10;
+String runMethod = "switch"; //change to "button" if using button
 
 Servo myServo; 
 
-//unsigned long cur_millis = 0;
-//unsigned long prev_millis = 0;
-
 int checkEstopButton();
+int checkEstopSwitch();
 int buttonPress = 0;
 
 void setup() {
@@ -34,7 +32,12 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  buttonPress = checkEstopButton();
+  if (runMethod == "button"){
+    buttonPress = checkEstopButton();
+  }
+  else if (runMethod == "switch"){
+    buttonPress = checkEstopSwitch();
+  }
 
   if (buttonPress == 1){
     myServo.write(90);
@@ -57,3 +60,14 @@ int checkEstopButton(){
     return 0;
   }
 }
+
+int checkEstopSwitch(){
+  // check if the button is being pressed
+  if (digitalRead(switchPin) == LOW){
+    return 1;
+  }
+  else{
+    return 0;
+  }
+}
+
