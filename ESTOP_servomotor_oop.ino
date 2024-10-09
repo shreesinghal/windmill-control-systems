@@ -19,12 +19,14 @@ class Estop {
     Estop(){
       this->switchPin = 11;
       this->estopButton = 10;
-      StepperMotor motor = new StepperMotor();
+      StepperMotor motor = new StepperMotor(2, 3);
+      pinMode(estopButton, INPUT_PULLUP);
+      pinMode(switchPin, INPUT_PULLUP);
     }
-    Estop(int switch1, int button1, int servo1){
+    Estop(int switch1, int button1, int dirPin, int stepPin){
       this->switchPin = switch1;
       this->estopButton = button1;
-      StepperMotor m = new StepperMotor(...fields...);
+      StepperMotor m = new StepperMotor(dirPin, stepPin);
     }
     void checkEstopButton(){
       // check if the button is being pressed
@@ -53,18 +55,14 @@ void setAngleStepper(int angle) {
 }
 };
 
-Estop reNU_windmill(11,10,9); //create an object of Estop class
+Estop reNU_windmill(11,10,9, 2, 3); //create an object of Estop class
 
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
 
-  reNU_windmill.setAngleStepper(0); //initialize servo to be open, windmill is free
+  reNU_windmill->setAngleStepper(0); //initialize servo to be open, windmill is free
   delay(1000);
-
-  pinMode(reNU_windmill.estopButton, INPUT_PULLUP);
-  pinMode(reNU_windmill.switchPin, INPUT_PULLUP);
-  reNU_windmill.myServo.attach(reNU_windmill.servoPin);
 }
 
 void loop() {
