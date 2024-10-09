@@ -13,20 +13,22 @@ class Estop {
     int estopButton;
     int servoPin;
     int buttonPress = 0;
-    String runMethod = "switch"; //change this to "button" to use button
+    String runMethod; //change this to "button" to use button
     StepperMotor motor;
 
     Estop(){
       this->switchPin = 11;
       this->estopButton = 10;
       StepperMotor motor = new StepperMotor(2, 3);
+      runMethod = "switch";
       pinMode(estopButton, INPUT_PULLUP);
       pinMode(switchPin, INPUT_PULLUP);
     }
-    Estop(int switch1, int button1, int dirPin, int stepPin){
+    Estop(int switch1, int button1, int dirPin, int stepPin, String run){
       this->switchPin = switch1;
       this->estopButton = button1;
       StepperMotor m = new StepperMotor(dirPin, stepPin);
+      runMethod = run;
     }
     void checkEstopButton(){
       // check if the button is being pressed
