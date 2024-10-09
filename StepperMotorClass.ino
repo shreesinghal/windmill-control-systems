@@ -3,14 +3,16 @@
 class StepperMotor {
   private:
     double angle;
-    const int dirPin = 2;
-    const int stepPin = 3;
+    const int dirPin;
+    const int stepPin;
     const int stepsPerRevolution = 200;
     const double anglePerStep = 1.8;
     bool run;
 
   public: 
-  StepperMotor() {
+  StepperMotor(int dirPinIn, int stepPinIn) {
+    dirPin = dirPinIn;
+    stepPin = stepPinIn;
     pinMode(stepPin, OUTPUT);
     pinMode(dirPin, OUTPUT);
     this->angle = 0;
