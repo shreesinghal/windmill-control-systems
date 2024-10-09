@@ -14,13 +14,13 @@ class Estop {
     int servoPin;
     int buttonPress = 0;
     String runMethod = "switch"; //change this to "button" to use button
-    Servo myServo;
+    StepperMotor motor;
 
     Estop(){
       this->switchPin = 11;
       this->estopButton = 10;
       this->servoPin = 9;
-      Servo myServo;
+      StepperMotor m;
     }
     Estop(int switch1, int button1, int servo1){
       this->switchPin = switch1;
