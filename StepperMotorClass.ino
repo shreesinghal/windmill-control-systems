@@ -3,8 +3,8 @@
 class StepperMotor {
   private:
     double angle;
-    const int dirPin;
-    const int stepPin;
+    int dirPin;
+    int stepPin;
     const int stepsPerRevolution = 200;
     const double anglePerStep = 1.8;
     bool run;
@@ -38,30 +38,33 @@ class StepperMotor {
     // Sets to the best approximation for angle
     // Divides the angle by 1.8
     void setAngle(double newAngle) {
-      //Serial.println("hi");
-      if (newAngle >= 90 || newAngle < 0) {
+      if (newAngle < 0 || newAngle >= 360) {
         Serial.println("Degree value out of bounds");
+        return;
       }
-
-      else if (this->angle != newAngle) {
-
-        // sets it counter 
-        if (newAngle > this->angle) {
-          this->spinCounterclockwise();
-        }
-        else {
-          this->spinClockwise();
-        }
-
-        for(int x = 0; x < abs(this->angleToSteps(newAngle - this->angle)); x++)
-        {
-          digitalWrite(stepPin, HIGH);
-          delayMicroseconds(3000);
-          digitalWrite(stepPin, LOW);
-          delayMicroseconds(3000);
-        }
-        this->angle = newAngle;
+    
+      // Calculate the difference between the target angle and the current angle
+      double angleDiff = newAngle - this->angle;
+      if (angleDiff < 0) {
+        // Move clockwise if the target angle is smaller
+        this->spinClockwise();
+      } else {
+        // Move counterclockwise if the target angle is larger
+        this->spinCounterclockwise();
       }
+    
+      int steps = abs(angleToSteps(angleDiff)); // Calculate the number of steps needed
+    
+      // Move the stepper motor to the desired position
+      for (int i = 0; i < steps; i++) {
+        digitalWrite(stepPin, HIGH);
+        delayMicroseconds(3000);  // Adjust timing as needed for stepper speed
+        digitalWrite(stepPin, LOW);
+        delayMicroseconds(3000);
+      }
+    
+      // After moving, update the angle to the new value
+      this->angle = newAngle;
     }
 
     // changes the angle by the amount given
@@ -84,20 +87,18 @@ StepperMotor *s;
 
 void setup() {
   // put your setup code here, to run once:
-  s = new StepperMotor();
+  s = new StepperMotor(7,6);
   Serial.begin(9600);
 
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-
   float degree;
   Serial.println("Enter in a degree: ");
-  if (Serial.available() > 0) {
-    degree = Serial.parseFloat();
-    Serial.println("calling");
-    s->setAngle(degree);
-  }
+  degree = Serial.parseFloat();
+  Serial.println("calling");
+  s->changeAngle(degree);
+
 
 }
