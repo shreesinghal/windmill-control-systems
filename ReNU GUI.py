@@ -19,8 +19,11 @@ import numpy as np
 
 data = {
     "time": 0,
+    "t": 0,
     "speed": 0,
     "wind": 0,
+    "m": 0,
+    "pitch": 0
 }
 lock = threading.Lock()
 # lock.release()
@@ -43,8 +46,9 @@ entry = Entry(can
 )
 can.create_window(20, 70, window=entry, anchor="nw", width=210, height=40)
 
-def set_angle():
-    print(entry.get())
+def set_angle(event):
+    data["pitch"] = int(entry.get())
+    print(event)
 
 button = Button(can, bg="red", text="->", borderwidth=0, highlightbackground="black", highlightcolor="blue", highlightthickness=1, command=set_angle)
 # can.create_window(240, 20, window=button, anchor="nw", width=40, height=40)
@@ -52,6 +56,7 @@ can.tag_bind(
     can.create_rectangle(240, 70, 280, 110, fill="#5555ee", outline=""),
     "<Button-1>", set_angle
 )
+ttk.Button(can, command=set_angle)
 can.create_text(260, 90, text=">")
 
 button = Button(can
@@ -59,8 +64,10 @@ button = Button(can
 )
 # can.create_window(20, 70, window=button, anchor="nw", width=260, height=40)
 
+data["e_stop"] = 0
 def stop(event):
-    print()
+    data["e_stop"] = 1
+
 can.tag_bind(
     can.create_rectangle(20, 20, 280, 60, fill="#ee5555", outline=""),
     "<Button-1>", stop
@@ -70,7 +77,7 @@ can.create_text(150, 40, text="E-STOP")
 
 
 class Graph():
-    def __init__(self, can, location, color):
+    def __init__(self, can, location, title, color):
         self.data = []
         self.location = location
         self.can = can
@@ -83,7 +90,7 @@ class Graph():
         )
         self.can.create_rectangle(location, outline="#cccccc", width=0)
         self.zero_line = self.can.create_line(0, 0, 0, 0, fill="gray", smooth=True, width=2, dash=True)
-        self.can.create_text(location[0], location[1] - 20, anchor="nw", text="Title", fill="black")
+        self.can.create_text(location[0], location[1] - 20, anchor="nw", text=title, fill="black")
         self.current_text = self.can.create_text(location[2] - 100, location[1] - 20, anchor="nw", text="Title", fill="black", font="Monospace")
 
     def to_real(self, data):
@@ -131,9 +138,9 @@ class Graph():
         self.render()
 
         
-g = Graph(can, (300, 40, 580, 120), "red")
-g2 = Graph(can, (300, 160, 580, 240), "blue")
-g3 = Graph(can, (300, 280, 580, 360), "green")
+g = Graph(can, (300, 40, 580, 120), "Tachometer", "red")
+g2 = Graph(can, (300, 160, 580, 240), "RPM", "blue")
+g3 = Graph(can, (300, 280, 580, 360), "T", "green")
 
 
 
@@ -149,9 +156,9 @@ fan = [
     
 
 def update(event):
-    g.add_data(data["time"], data["speed"])
-    g2.add_data(data["time"], 1 - data["speed"])
-    g3.add_data(data["time"], 5 - data["speed"] ** 2)
+    g.add_data(data["time"], data["t"])
+    g2.add_data(data["time"], data["speed"])
+    g3.add_data(data["time"], data["m"])
     
     for i in range(0,3):
         angle = (np.pi * 2 / 3) * i + -data["time"]#data["speed"]
@@ -194,26 +201,57 @@ class A(threading.Thread):
         threading.Thread.__init__(self)
         self.start_time=time.monotonic()
         self.data = data
-        self.usb = serial.Serial("COM5", 9600)
+        self.usb = serial.Serial("/dev/cu.usbserial-10", 9600, timeout=0.1)
 
     def run(self):
         while(True):
             # fake loop
-            time.sleep(0.01)
+
             _time = time.monotonic()
             self.data["time"] = _time - self.start_time
-            self.data["speed"] = np.sin(_time * 1)
-            # print(data)
+            # self.data["speed"] = np.sin(_time * 1)
+            # self.usb.write(bytes("hi \n", "utf-8"))
+            # value 
+            # print("writing:", 
+                #   )
+            # print(int(data["e_stop"] * 100).to_bytes(1, "big"))
+            # print(int(_time % 255).to_bytes(1, "big"))
+            # print(bytes(1))
+            # print(self.usb.write(bytes(4)))
+            # print(self.usb.write((4).to_bytes()))
+                # print(self.usb.write(b"\n"))
+            # self.usb.flush()
 
             # wait for a message
-            while(self.usb.in_waiting == 0):
-                pass
+            # print(self.usb.in_waiting)
+            if(self.usb.in_waiting >= 3):
+            
+
 
             # read
-            line = self.usb.readline()
-            print(line)
+            # 1 or 0 for tachyometer
+            
+                self.data["t"] = int.from_bytes(self.usb.read()) * 2 - 1
+                self.data["speed"] = int.from_bytes(self.usb.read()) + 5
+                self.data["m"] = int.from_bytes(self.usb.read()) + 5
+                self.usb.write((self.data["pitch"]).to_bytes(1, "big"))
+                self.usb.write((self.data["e_stop"]).to_bytes(1, "big"))
+
+            # byte for pitch change
+                print(self.data["pitch"])
+
+            # elecricity generated
+            # line = self.usb.read()
+
+
+
+            # print(line, _time)
+
+            # print(data)
+
 
             # send data
+            
             # if e-stop has been pushed, stop
 
 
@@ -221,8 +259,9 @@ class A(threading.Thread):
             
 
             
-            # update graph
-            # can.event_generate("<<read>>")
+                # update graph
+                can.event_generate("<<read>>")
+            # time.sleep(0.5)
 
             
 
