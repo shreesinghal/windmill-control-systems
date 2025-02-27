@@ -1,5 +1,3 @@
-
-
 class StepperMotor {
   private:
     double angle;
@@ -37,12 +35,7 @@ class StepperMotor {
     // Set to angle
     // Sets to the best approximation for angle
     // Divides the angle by 1.8
-    void setAngle(double newAngle) {
-      if (newAngle < 0 || newAngle >= 360) {
-        Serial.println("Degree value out of bounds");
-        return;
-      }
-    
+    void setAngle(double newAngle) {    
       // Calculate the difference between the target angle and the current angle
       double angleDiff = newAngle - this->angle;
       if (angleDiff < 0) {
@@ -80,25 +73,3 @@ class StepperMotor {
   
 };
 
-//change in wind speed from one state to another surpasses a certain threshold
-
-StepperMotor *s;
-
-
-void setup() {
-  // put your setup code here, to run once:
-  s = new StepperMotor(7,6);
-  Serial.begin(9600);
-
-}
-
-void loop() {
-  // put your main code here, to run repeatedly:
-  float degree;
-  Serial.println("Enter in a degree: ");
-  degree = Serial.parseFloat();
-  Serial.println("calling");
-  s->changeAngle(degree);
-
-
-}
