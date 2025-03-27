@@ -1,7 +1,8 @@
 const int directionPin = 7, stepPin = 6;
 StepperMotor *s;
+Tachometer *t;
 
-const int MH_SENSOR = 3;
+const int MH_SENSOR = 12;
 bool prevState = false;
 float RPM = 0, period = 0;
 unsigned long startTime = 0;
@@ -9,6 +10,7 @@ unsigned long startTime = 0;
 void setup() {
   // instantiate stepper motor
   s = new StepperMotor(directionPin, stepPin);
+  t = new Tachometer(MH_SENSOR);
 
   // tachometer setup
   pinMode(MH_SENSOR, INPUT);

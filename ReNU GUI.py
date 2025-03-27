@@ -201,7 +201,7 @@ class A(threading.Thread):
         threading.Thread.__init__(self)
         self.start_time=time.monotonic()
         self.data = data
-        self.usb = serial.Serial("/dev/cu.usbserial-10", 9600, timeout=0.1)
+        self.usb = serial.Serial("/dev/cu.usbmodem1101", 9600, timeout=0.1)
 
     def run(self):
         while(True):
@@ -224,21 +224,30 @@ class A(threading.Thread):
 
             # wait for a message
             # print(self.usb.in_waiting)
-            if(self.usb.in_waiting >= 3):
+            # if(self.usb.in_waiting >= 3):
             
 
 
             # read
             # 1 or 0 for tachyometer
             
-                self.data["t"] = int.from_bytes(self.usb.read()) * 2 - 1
-                self.data["speed"] = int.from_bytes(self.usb.read()) + 5
-                self.data["m"] = int.from_bytes(self.usb.read()) + 5
-                self.usb.write((self.data["pitch"]).to_bytes(1, "big"))
-                self.usb.write((self.data["e_stop"]).to_bytes(1, "big"))
+            time.sleep(.01)
+            
+            self.data["t"] = int.from_bytes(self.usb.read()) * 2 - 1
+            self.data["speed"] = int.from_bytes(self.usb.read()) + 5
+            self.data["m"] = int.from_bytes(self.usb.read()) + 5
+
+            
+            # print(self.data["t"],
+            #     self.data["speed"],
+            #     self.data["m"])
+            self.usb.write((self.data["pitch"]).to_bytes(1, "big"))
+            self.usb.write((self.data["e_stop"]).to_bytes(1, "big"))
+
+            
 
             # byte for pitch change
-                print(self.data["pitch"])
+                # print(self.data["pitch"])
 
             # elecricity generated
             # line = self.usb.read()
@@ -260,7 +269,7 @@ class A(threading.Thread):
 
             
                 # update graph
-                can.event_generate("<<read>>")
+            can.event_generate("<<read>>")
             # time.sleep(0.5)
 
             
