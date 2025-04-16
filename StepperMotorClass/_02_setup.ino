@@ -1,4 +1,4 @@
-const int directionPin = 7, stepPin = 6;
+const int directionPin = 6, stepPin = 7;
 StepperMotor *s;
 Tachometer *t;
 

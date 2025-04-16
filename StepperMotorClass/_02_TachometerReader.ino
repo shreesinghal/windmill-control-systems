@@ -5,6 +5,9 @@ class Tachometer {
     bool prevState;
     long startTime;
     long period;
+     
+    // float[] rpms = float[50]
+    // float[] stack = float[50]
 
   public:
   Tachometer(int pin) {

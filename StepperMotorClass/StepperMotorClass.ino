@@ -45,6 +45,7 @@ class StepperMotor {
         // Move counterclockwise if the target angle is larger
         this->spinCounterclockwise();
       }
+      Serial.println(angleDiff);
     
       int steps = abs(angleToSteps(angleDiff)); // Calculate the number of steps needed
     
@@ -58,6 +59,14 @@ class StepperMotor {
     
       // After moving, update the angle to the new value
       this->angle = newAngle;
+    }
+
+    void spinForever(){
+      spinClockwise();
+      while(true) {
+        digitalWrite(stepPin, HIGH);
+
+      }
     }
 
     // changes the angle by the amount given

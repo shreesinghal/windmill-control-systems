@@ -20,20 +20,19 @@ void loop() {
   // Serial.println("done");
   
   // t->measureSensor();
+  
+  s->setAngle(angle);
+  angle += 10;
+  delay(1000);
+  return;
 
   
   // Serial.println(t->getRPM());
-  delay(20);
-
-  
 
   // update readings
   // windspeed
 
-  // delay(50);
-  
-  float[] rpms = float[50]
-  float[] stack = float[50]
+ 
   
     // send data
   if (digitalRead(MH_SENSOR) == HIGH) {
