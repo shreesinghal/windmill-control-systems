@@ -7,14 +7,17 @@ class LinearActuator {
   LinearActuator(int PowerPin, int GndPin) {
     this->PowerPin = PowerPin;
     this->GndPin = GndPin;
+    
+    pinMode(GndPin, OUTPUT);
+    pinMode(PowerPin, OUTPUT);
   }
 
   void FullyExtend(){
-    pinMode(PowerPin, HIGH);
-    pinMode(GndPin, LOW);
+    digitalWrite(PowerPin, HIGH);
+    digitalWrite(GndPin, LOW);
   }
   void FullyRetract(){
-    pinMode(PowerPin, LOW);
-    pinMode(GndPin, HIGH);
+    digitalWrite(PowerPin, LOW);
+    digitalWrite(GndPin, HIGH);
   }
-}
+};

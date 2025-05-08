@@ -20,10 +20,21 @@ void loop() {
   // Serial.println("done");
   
   // t->measureSensor();
+
+  // digitalWrite(PowerPin, HIGH);
+  // digitalWrite(GndPin, LOW);
+
+  // return;
   
-  s->setAngle(angle);
+  // l -> FullyRetract();
+  
+  s->spinForever();
   angle += 10;
   delay(1000);
+  
+  l -> FullyExtend();
+  
+  delay(100);
   return;
 
   
