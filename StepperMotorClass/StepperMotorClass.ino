@@ -1,43 +1,46 @@
 class StepperMotor {
   private:
-    double angle;
+    double angle = 0;
     int dirPin;
     int stepPin;
     const int stepsPerRevolution = 200;
     const double anglePerStep = 360 / stepsPerRevolution;
     bool run;
 
-  public: 
-  StepperMotor(int dirPinIn, int stepPinIn) {
-    dirPin = dirPinIn;
-    stepPin = stepPinIn;
-    pinMode(stepPin, OUTPUT);
-    pinMode(dirPin, OUTPUT);
-    this->angle = 0;
-  }
+    int angleToSteps(double angle) {
+      return angle / anglePerStep;
+    }
 
-    // negative 
+  public: 
+    StepperMotor(int dirPinIn, int stepPinIn) {
+      dirPin = dirPinIn;
+      stepPin = stepPinIn;
+
+      pinMode(stepPin, OUTPUT);
+      pinMode(dirPin, OUTPUT);
+    }
+
+    // negative changeAngle
     void spinClockwise() {
       digitalWrite(dirPin, HIGH);
     }
     
-    // positive
+    // positive changeAngle
     void spinCounterclockwise() {
       digitalWrite(dirPin, LOW);
     }
 
-    // resets the stepper to 0
+    // resets the stepper to 0 deg
     void resetStepper() {
       // send it the negative of angle
       this->setAngle(0);
     }
 
-    // Set to angle
-    // Sets to the best approximation for angle
-    // Divides the angle by 1.8
+    // set to the given angle
     void setAngle(double newAngle) {    
       // Calculate the difference between the target angle and the current angle
       double angleDiff = newAngle - this->angle;
+
       if (angleDiff < 0) {
         // Move clockwise if the target angle is smaller
         this->spinClockwise();
@@ -57,11 +60,11 @@ class StepperMotor {
         delayMicroseconds(3000);
       }
     
-      // After moving, update the angle to the new value
+      // after moving, update the angle to the new value
       this->angle = newAngle;
     }
 
-    void spinForeverToTest(){
+    void spin100StepsToTest(){
       spinClockwise();
       for (int i = 0; i < 100; i++) {
       digitalWrite(stepPin, HIGH);
@@ -75,12 +78,5 @@ class StepperMotor {
     void changeAngle(double inc) {
       this->setAngle(this->angle + inc);
     }
-
-  private:
-    int angleToSteps(double angle) {
-      return angle / anglePerStep;
-    }
-
-  
 };
 

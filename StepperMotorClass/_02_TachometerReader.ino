@@ -1,43 +1,38 @@
+// these are global variables so that it can be accessed by static methods
+volatile unsigned long period = 0;
+volatile unsigned long lastTime = 0;
+
 class Tachometer {
   private:
-    float RPM;
-    int pin;
-    bool prevState;
-    long startTime;
-    long period;
-    int numBlades = 3;
+    const int numBlades = 3;
 
   public:
-  Tachometer(int pin) {
-    this->pin = pin;
-    pinMode(pin, INPUT);
-    this->RPM = 0.0;
-    this->prevState = false;
-  }
+    Tachometer(int mhSensorPin) {
+      pinMode(mhSensorPin, INPUT);
 
-  void measureSensor() {
-    if (digitalRead(pin) == HIGH && prevState == false) {       //End of last blade
-      startTime = millis();    
-
-      Serial.println("END OF BLADE");
-
-      prevState = true;
+      // This attaches an interupt to the sensor pin. 
+      //   So, whenever the pin reads HIGH to LOW (aka falling),
+      //   it will automatically run the calculatePeriod function to calculate the period
+      attachInterrupt(digitalPinToInterrupt(mhSensorPin), calculatePeriod, FALLING);
     }
 
-    if (digitalRead(pin) == LOW && prevState == true) {         //Start of next blade
-      period = millis() - startTime;
-      RPM = 60000 / period;
-      
-      Serial.println("START OF BLADE");
+    float getRPM() {
+      noInterrupts();             // prevent update while reading
+      unsigned long p = period;
+      interrupts();
 
-      prevState = false;
-      
+      if (p > 0) {    // avoid div by 0
+        float rpm = (60000.0 / p) / numBlades;
+        return rpm;
+      } else {
+        return 0.0;
+      }
     }
-    Serial.println(RPM/3);
-  }
-  
-  float getRPM() {
-    return RPM / numBlades;
-  }
 
+    // this is an ISR Interupt Service Routine Function
+    static void calculatePeriod() {
+      unsigned long now = millis();
+      period = now - lastTime;
+      lastTime = now;
+    }
 };
