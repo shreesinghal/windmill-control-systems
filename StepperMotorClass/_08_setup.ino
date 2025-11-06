@@ -16,6 +16,8 @@ void setup() {
   pitchStepper = new StepperMotor(stepperDirPin, stepperStepPin);
   tacho = new Tachometer(MH_SENSOR);
   linAct = new LinearActuator(actRedWire, actBlackWire);
+  
+  pinMode(LED_BUILTIN, OUTPUT);
 
   Serial.begin(9600);
 }
